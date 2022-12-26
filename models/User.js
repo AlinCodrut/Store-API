@@ -1,10 +1,7 @@
 const mongoose = require("mongoose")
 const validator = require("validator") // asta e un pachet pe care sa-l folisim ca sa putem valida adresa de email sau alte lucruri ce ne trebuie fara sa mai tot scriem regEX si altele
-const bcrypt = require('bcryptjs') // Pachet pentru hasihin parola
-const jwt = require('jsonwebtoken') // Pachet pentru a genera web token
-
-
-
+const bcrypt = require("bcryptjs") // Pachet pentru hasihin parola
+const jwt = require("jsonwebtoken") // Pachet pentru a genera web token
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -34,22 +31,18 @@ const UserSchema = new mongoose.Schema({
   }
 })
 
+UserSchema.pre("save", async function () {
+  // aici criptam parola
+  if (!this.isModified("password")) return
 
-UserSchema.pre('save', async function () {   // aici criptam parola
   const salt = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, salt)
 })
 
-UserSchema.methods.comparePassword = async function (canditatePassword) {  //ca sa comparam parola sa vedem daca este a usereului atunci cand face login
+UserSchema.methods.comparePassword = async function (canditatePassword) {
+  //ca sa comparam parola sa vedem daca este a usereului atunci cand face login
   const isMatch = await bcrypt.compare(canditatePassword, this.password)
   return isMatch
 }
-
-
-
-
-
-
-
 
 module.exports = mongoose.model("User", UserSchema)

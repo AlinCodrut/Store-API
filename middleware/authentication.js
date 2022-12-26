@@ -14,17 +14,19 @@ const authenticateUser = async (req, res, next) => {
 
   try {
     const { name, userId, role } = isTokenValid({ token })
-
-    req.user = { name, userId, role } // aici redefin obiectul user ce venea in req, si ii atribuim aceleasi valori dar dupa ce a fost verificat tokenul
+    req.user = { name, userId, role }
+    next()
   } catch (error) {
     throw new UnauthenticatedError("Authentication invalid")
   }
-  next()
 }
 
-const authorizePermissions = async (req, res, next) => {
-  if (req.user.role !== "admin") {
-    throw new UnauthorizedError("Access denied")
+const authorizePermissions = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      throw new UnauthorizedError("Unauthorized acces")
+    }
+    next()
   }
   next()
 }

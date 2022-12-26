@@ -8,13 +8,10 @@ const createJWT = ({ payload }) => {
   return token
 }
 
-const isTokenValid = ({ token }) => {
-  jwt.verify(token, process.env.JWT_SECRET)
-}
+const isTokenValid = ({ token }) => jwt.verify(token, process.env.JWT_SECRET)
 
 const attachCookiesToResponse = async ({ res, user }) => {
   const token = createJWT({ payload: user })
-
   const oneDay = 1000 * 60 * 60 * 24 * 30 //punem aceiasi data in care expira si token-ul
   res.cookie("token", token, {
     //primul argument este numele pe care vrem sa-l dam la cookie, iar al doilea este tokenul pe car tocmai l-am creat
@@ -23,8 +20,6 @@ const attachCookiesToResponse = async ({ res, user }) => {
     secure: process.env.NODE_ENV === "production",
     signed: true
   })
-
-  res.status(201).json({ user })
 }
 
 module.exports = {

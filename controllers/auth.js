@@ -1,7 +1,7 @@
 const User = require("../models/User")
 const { StatusCodes } = require("http-status-codes")
 const { BadRequestError, UnauthenticatedError } = require("../errors")
-const { attachCookiesToResponse } = require("../utilitys")
+const { attachCookiesToResponse, createTokenuser } = require("../utilitys")
 
 const register = async (req, res) => {
   const { email, name, password } = req.body
@@ -18,7 +18,7 @@ const register = async (req, res) => {
 
   const user = await User.create({ name, email, password, role })
 
-  const tokenUser = { name: user.name, userId: user._id, role: user.role } //ce informatii vrem sa trimitem in raspuns
+  const tokenUser = createTokenuser(user) //ce informatii vrem sa trimitem in raspuns
   attachCookiesToResponse({ res, user: tokenUser }) //creem token si atasam la cookie cu functia pe care am importato din utilitys si trimitem raspunsul
 
   res.status(StatusCodes.CREATED).json({ user: tokenUser })
@@ -41,7 +41,7 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new UnauthenticatedError("Invalid Credentials")
   }
-  const tokenUser = { name: user.name, userId: user._id, role: user.role } //ce informatii vrem sa trimitem in raspuns
+  const tokenUser = createTokenuser(user) //ce informatii vrem sa trimitem in raspuns
   attachCookiesToResponse({ res, user: tokenUser }) //creem token si atasam la cookie cu functia pe care am importato din utilitys si trimitem raspunsul
   res.status(StatusCodes.OK).json({ user: tokenUser })
 }
