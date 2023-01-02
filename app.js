@@ -2,6 +2,7 @@ require("dotenv").config()
 const express = require("express")
 const app = express()
 require("express-async-errors")
+const fileUpload = require("express-fileupload")
 
 //rest of the packages
 
@@ -12,6 +13,8 @@ const cookieParser = require("cookie-parser") //pachetul ca sa putem accesa date
 app.use(morgan("tiny"))
 app.use(express.json())
 app.use(cookieParser(process.env.JWT_SECRET))
+app.use(express.static("./public"))
+app.use(fileUpload())
 
 // Basic Routes
 
@@ -22,10 +25,12 @@ app.get("/", (req, res) => {
 const authRouter = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
 const productRouter = require("./routes/productRoutes")
+const reviewRouter = require("./routes/reviewRoutes")
 
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/users", userRoutes)
 app.use("/api/v1/products", productRouter)
+app.use("/api/v1/reviews", reviewRouter)
 
 // Our middleware
 const notFound = require("./middleware/not-found")

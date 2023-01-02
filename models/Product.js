@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const validator = require("validator")
 
 const ProductSchema = mongoose.Schema(
   {
@@ -17,11 +16,11 @@ const ProductSchema = mongoose.Schema(
     description: {
       type: String,
       required: [true, "Please provide a description"],
-      maxLength: [250, "Descrierea nu poate fi mai mult de 1000 de caractere"]
+      maxLength: [50000, "Descrierea nu poate fi mai mult de 1000 de caractere"]
     },
     image: {
       type: String,
-      default: "/uploads/example.jpeg"
+      default: "/uploads/360.jpeg"
     },
     category: {
       type: String,
@@ -37,7 +36,8 @@ const ProductSchema = mongoose.Schema(
     },
     colors: {
       type: [String],
-      require: true
+      require: true,
+      default: ["#222"]
     },
     marimi: {
       type: [Number],
