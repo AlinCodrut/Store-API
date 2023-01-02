@@ -21,8 +21,11 @@ app.get("/", (req, res) => {
 
 const authRouter = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
+const productRouter = require("./routes/productRoutes")
+
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/users", userRoutes)
+app.use("/api/v1/products", productRouter)
 
 // Our middleware
 const notFound = require("./middleware/not-found")

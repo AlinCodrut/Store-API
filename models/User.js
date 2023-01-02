@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const validator = require("validator") // asta e un pachet pe care sa-l folisim ca sa putem valida adresa de email sau alte lucruri ce ne trebuie fara sa mai tot scriem regEX si altele
 const bcrypt = require("bcryptjs") // Pachet pentru hasihin parola
-const jwt = require("jsonwebtoken") // Pachet pentru a genera web token
+
 
 const UserSchema = new mongoose.Schema({
   name: {
