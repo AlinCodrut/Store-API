@@ -32,7 +32,39 @@ const ReviewSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-ReviewSchema.index({product : 1 , user : 1} , {unique: true})  //Sa indexam reviewurile si sa le facem unice incat un user sa nu poate las mai mult de un raiting per produs
+ReviewSchema.index({ product: 1, user: 1 }, { unique: true }) //Sa indexam reviewurile si sa le facem unice incat un user sa nu poate las mai mult de un raiting per produs
 
+ReviewSchema.statics.calculateAverageRating = async function (productId) {
+  const result = await this.aggregate([
+    { $match: { product: productId } },
+    {
+      $group: {
+        _id: null,
+        avarageRating: { $avg: "$rating" },
+        numOfReviews: { $sum: 1 }
+      }
+    }
+  ])
 
-module.exports = mongoose.model("Reviews", ReviewSchema)
+  try {
+    await this.model("Product").findOneAndUpdate(
+      { _id: productId },
+      {
+        avarageRating: Math.ceil(result[0]?.avarageRating || 0),
+        numOfReviews: result[0]?.numOfReviews || 0
+      }
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+ReviewSchema.post("save", async function () {
+  await this.constructor.calculateAverageRating(this.product)
+})
+
+ReviewSchema.post("remove", async function () {
+  await this.constructor.calculateAverageRating(this.product)
+})
+
+module.exports = mongoose.model("Review", ReviewSchema)

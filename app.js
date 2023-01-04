@@ -8,6 +8,20 @@ const fileUpload = require("express-fileupload")
 
 const morgan = require("morgan") // asta e un pachet ce ne spune de fiecare data in consola ce pagina am vrut sa accesem cu ce status code si tot
 const cookieParser = require("cookie-parser") //pachetul ca sa putem accesa datele dintr-un cookie
+const rateLimiter = require("express-rate-limit")
+const helmet = require("helmet")
+const xss = require("xss-clean")
+const cors = require("cors")
+const mongoSanitize = require("express-mongo-sanitize")
+
+//security packages
+
+app.set("trust proxy", 1)
+app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+app.use(helmet())
+app.use(cors())
+app.use(xss())
+app.use(mongoSanitize())
 
 // Builtin express middleware
 app.use(morgan("tiny"))
@@ -26,11 +40,13 @@ const authRouter = require("./routes/authRoutes")
 const userRoutes = require("./routes/userRoutes")
 const productRouter = require("./routes/productRoutes")
 const reviewRouter = require("./routes/reviewRoutes")
+const orderRoutes = require("./routes/orderRoutes")
 
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/users", userRoutes)
 app.use("/api/v1/products", productRouter)
 app.use("/api/v1/reviews", reviewRouter)
+app.use("/api/v1/orders", orderRoutes)
 
 // Our middleware
 const notFound = require("./middleware/not-found")

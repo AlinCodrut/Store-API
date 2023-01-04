@@ -6,6 +6,14 @@ const { checkPermission } = require("../utilitys")
 
 const getAllReviews = async (req, res) => {
   const reviews = await Review.find({})
+    .populate({
+      path: "product",
+      select: "name producator price"
+    })
+    .populate({
+      path: "user",
+      select: "name"
+    })
   res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
 }
 
@@ -40,11 +48,41 @@ const createReview = async (req, res) => {
 }
 
 const updateReview = async (req, res) => {
-  res.send("update reviwes")
+  const { id: reviewId } = req.params
+  const { rating, title, comment } = req.body
+
+  const review = await Review.findOne({ _id: reviewId })
+  if (!reviewId) {
+    throw new NotFoundError(` No such review whit the ${reviewId}`)
+  }
+  checkPermission(req.user, review.user)
+
+  review.title = title
+  review.rating = rating
+  review.comment = comment
+
+  await review.save()
+
+  res.status(StatusCodes.OK).json({ review })
 }
 
 const deleteReview = async (req, res) => {
-  res.send("deleting reviwes")
+  const { id: reviewId } = req.params
+
+  const review = await Review.findOne({ _id: reviewId })
+  if (!reviewId) {
+    throw new NotFoundError(` No such review whit the ${reviewId}`)
+  }
+  checkPermission(req.user, review.user)
+
+  await review.remove()
+  res.status(StatusCodes.OK).json("Review deleted successfully")
+}
+
+const getSingleProductReviews = async (req, res) => {
+  const { id: productId } = req.params
+  const reviews = await Review.find({ product: productId })
+  res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
 }
 
 module.exports = {
@@ -52,5 +90,6 @@ module.exports = {
   getSingleReview,
   updateReview,
   createReview,
-  deleteReview
+  deleteReview,
+  getSingleProductReviews
 }

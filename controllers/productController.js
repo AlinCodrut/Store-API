@@ -12,7 +12,7 @@ const getAllProducts = async (req, res) => {
 const getSingleProduct = async (req, res) => {
   const { id: productId } = req.params // este id si nu _id deoarece in router am specificat id simplu fara liniuta
 
-  const product = await Product.findOne({ _id: productId })
+  const product = await Product.findOne({ _id: productId }).populate("reviews")
   res.status(StatusCodes.OK).json({ product })
 
   if (!product) {
